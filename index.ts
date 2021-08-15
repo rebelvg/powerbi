@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as _ from 'lodash';
 
 process.on('unhandledRejection', (error) => {
   console.error('error', error);
@@ -17,29 +18,33 @@ function parseArguments(args: string[]): {
   environment: string;
 } {
   const expectedArgs = [
-    'tenant_id',
-    'username',
-    'password',
-    'client_id',
-    'client_secret',
-    'scope',
-    'resource',
-    'environment',
+    '--tenant_id',
+    '--username',
+    '--password',
+    '--client_id',
+    '--client_secret',
+    '--scope',
+    '--resource',
+    '--environment',
   ];
 
   const parsedArgs: any = {};
 
   args.forEach((arg, index) => {
-    if (expectedArgs.includes(`--${arg}`)) {
+    console.log(arg, index);
+
+    if (expectedArgs.includes(arg)) {
       const nextArgument = args[index + 1];
 
       if (!nextArgument) {
         throw new Error('bad_argument');
       }
 
-      parsedArgs[arg] = nextArgument;
+      parsedArgs[arg.substring(2)] = nextArgument;
     }
   });
+
+  console.log(parsedArgs);
 
   return parsedArgs;
 }
@@ -139,6 +144,8 @@ async function getGroupId({
     resource,
     environment,
   });
+
+  throw 1;
 
   const authToken = await retrieveToken({
     tenantId: tenant_id,
