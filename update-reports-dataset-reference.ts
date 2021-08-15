@@ -2,13 +2,7 @@ import axios from 'axios';
 
 import { parseArguments, retrieveToken } from './get-group-id';
 
-process.on('unhandledRejection', (error) => {
-  console.error('error', error);
-
-  process.exit(1);
-});
-
-async function getReportsByGroupId({
+export async function getReportsByGroupId({
   authToken,
   groupId,
 }: {
@@ -42,7 +36,7 @@ async function getReportsByGroupId({
   return value;
 }
 
-async function updateReportsDatasetReference({
+export async function updateReportsDatasetReference({
   groupId,
   currentReports,
   reports,
@@ -60,104 +54,21 @@ async function updateReportsDatasetReference({
 }) {
   for (const currentReport of currentReports) {
     if (reports.includes(currentReport.id)) {
-      if (currentReport.datasetId === requestBody.datasetId) {
-        try {
-          await axios.post(
-            `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}`,
-            requestBody,
-            {
-              headers: {
-                Authorization: `Bearer ${authToken}`,
-              },
+      try {
+        await axios.post(
+          `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}`,
+          requestBody,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
             },
-          );
-        } catch (error) {
-          console.error('rebind_failed', error?.response?.body, error.message);
-        }
+          },
+        );
+      } catch (error) {
+        console.error('rebind_failed', error?.response?.body, error.message);
       }
+    } else {
+      console.log('not_in_reports');
     }
   }
 }
-
-(async () => {
-  const {
-    tenant_id,
-    username,
-    password,
-    client_id,
-    client_secret,
-    scope,
-    resource,
-    environment,
-    group_id,
-    request_body,
-    reports,
-  } = parseArguments<{
-    tenant_id: string;
-    username: string;
-    password: string;
-    client_id: string;
-    client_secret: string;
-    scope: string;
-    resource: string;
-    environment: string;
-    group_id: string;
-    request_body: string;
-    reports: string;
-  }>(process.argv, [
-    '--tenant_id',
-    '--username',
-    '--password',
-    '--client_id',
-    '--client_secret',
-    '--scope',
-    '--resource',
-    '--environment',
-    '--group_id',
-    '--request_body',
-    '--reports',
-  ]);
-
-  const requestBodyJson = JSON.parse(request_body);
-  const reportsJson: string[] = JSON.parse(reports);
-
-  console.log('parsed_args', {
-    tenant_id,
-    username,
-    client_id,
-    scope,
-    resource,
-    environment,
-    group_id,
-    request_body,
-    reports,
-  });
-
-  const authToken = await retrieveToken({
-    tenantId: tenant_id,
-    username,
-    password,
-    clientId: client_id,
-    clientSecret: client_secret,
-    scope,
-    resource,
-  });
-
-  const reportsByGroup = await getReportsByGroupId({
-    authToken,
-    groupId: group_id,
-  });
-
-  console.log(reportsByGroup);
-
-  await updateReportsDatasetReference({
-    groupId: group_id,
-    currentReports: reportsByGroup.map((report) => ({
-      id: report.id,
-      datasetId: report.datasetId,
-    })),
-    reports: reportsJson,
-    requestBody: requestBodyJson,
-    authToken,
-  });
-})();

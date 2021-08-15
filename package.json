@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "get-group-id": "ts-node get-group-id.ts",
-    "update-reports-dataset-reference": "ts-node update-reports-dataset-reference.ts"
+    "get-group-id": "ts-node get-group-id-start.ts",
+    "update-reports-dataset-reference": "ts-node update-reports-dataset-reference-start.ts"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.172",

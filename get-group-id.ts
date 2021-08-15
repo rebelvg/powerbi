@@ -1,12 +1,6 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-process.on('unhandledRejection', (error) => {
-  console.error('error', error);
-
-  process.exit(1);
-});
-
 export function parseArguments<T>(args: string[], expectedArgs: string[]): T {
   const parsedArgs: any = {};
 
@@ -65,7 +59,7 @@ export async function retrieveToken({
   return data.access_token;
 }
 
-async function getGroupId({
+export async function getGroupId({
   authToken,
   environment,
 }: {
@@ -101,62 +95,3 @@ async function getGroupId({
 
   return groupId;
 }
-
-(async () => {
-  const {
-    tenant_id,
-    username,
-    password,
-    client_id,
-    client_secret,
-    scope,
-    resource,
-    environment,
-  } = parseArguments<{
-    tenant_id: string;
-    username: string;
-    password: string;
-    client_id: string;
-    client_secret: string;
-    scope: string;
-    resource: string;
-    environment: string;
-  }>(process.argv, [
-    '--tenant_id',
-    '--username',
-    '--password',
-    '--client_id',
-    '--client_secret',
-    '--scope',
-    '--resource',
-    '--environment',
-  ]);
-
-  console.log('parsed_args', {
-    tenant_id,
-    username,
-    client_id,
-    scope,
-    resource,
-    environment,
-  });
-
-  const authToken = await retrieveToken({
-    tenantId: tenant_id,
-    username,
-    password,
-    clientId: client_id,
-    clientSecret: client_secret,
-    scope,
-    resource,
-  });
-
-  const groupId = await getGroupId({
-    authToken,
-    environment,
-  });
-
-  console.log(`##vso[task.setvariable variable=group_id]${groupId}`);
-
-  process.exit(0);
-})();
