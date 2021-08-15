@@ -1,4 +1,5 @@
-import { getGroupId, parseArguments, retrieveToken } from './get-group-id';
+import { parseArguments, retrieveToken } from './get-group-id';
+import { setScheduledRefreshDetails } from './set-scheduled-refresh-details';
 
 process.on('unhandledRejection', (error) => {
   console.error('error', error);
@@ -16,6 +17,8 @@ process.on('unhandledRejection', (error) => {
     scope,
     resource,
     environment,
+    group_id,
+    dataset_id,
   } = parseArguments<{
     tenant_id: string;
     username: string;
@@ -25,6 +28,8 @@ process.on('unhandledRejection', (error) => {
     scope: string;
     resource: string;
     environment: string;
+    group_id: string;
+    dataset_id: string;
   }>(process.argv, [
     '--tenant_id',
     '--username',
@@ -34,6 +39,8 @@ process.on('unhandledRejection', (error) => {
     '--scope',
     '--resource',
     '--environment',
+    '--group_id',
+    '--dataset_id',
   ]);
 
   console.log(`******************************************
@@ -57,10 +64,9 @@ process.on('unhandledRejection', (error) => {
     resource,
   });
 
-  const groupId = await getGroupId({
+  await setScheduledRefreshDetails({
     authToken,
-    environment,
+    groupId: group_id,
+    datasetId: dataset_id,
   });
-
-  console.log(`##vso[task.setvariable variable=group_id]${groupId}`);
 })();

@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "get-group-id": "ts-node get-group-id-start.ts",
-    "update-reports-dataset-reference": "ts-node update-reports-dataset-reference-start.ts"
+    "update-reports-dataset-reference": "ts-node update-reports-dataset-reference-start.ts",
+    "set-scheduled-refresh-details": "ts-node set-scheduled-refresh-details-start.ts"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.172",

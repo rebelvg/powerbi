@@ -90,6 +90,4 @@ process.on('unhandledRejection', (error) => {
     requestBody: requestBodyJson,
     authToken,
   });
-
-  console.log('update_reports_done');
 })();
