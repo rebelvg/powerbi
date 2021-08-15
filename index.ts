@@ -63,19 +63,19 @@ async function retrieveToken({
 }): Promise<string> {
   const { data } = await axios.post<{ access_token: string }>(
     `https://login.windows.net/${tenantId}/oauth2/token`,
+    [
+      'grant_type=password',
+      `username=${username}`,
+      `password=${password}`,
+      `client_id=${clientId}`,
+      `client_secret=${clientSecret}`,
+      `scope=${scope}`,
+      `resource=${resource}`,
+    ].join('&'),
     {
-      Headers: {
+      headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      data: [
-        'grant_type=password',
-        `username=${username}`,
-        `password=${password}`,
-        `client_id=${clientId}`,
-        `client_secret=${clientSecret}`,
-        `scope=${scope}`,
-        `resource=${resource}`,
-      ].join('&'),
     },
   );
 
