@@ -19,6 +19,7 @@ process.on('unhandledRejection', (error) => {
     environment,
     group_id,
     dataset_id,
+    request_body,
   } = parseArguments<{
     tenant_id: string;
     username: string;
@@ -30,6 +31,7 @@ process.on('unhandledRejection', (error) => {
     environment: string;
     group_id: string;
     dataset_id: string;
+    request_body: string;
   }>(process.argv, [
     '--tenant_id',
     '--username',
@@ -41,6 +43,7 @@ process.on('unhandledRejection', (error) => {
     '--environment',
     '--group_id',
     '--dataset_id',
+    '--request_body',
   ]);
 
   console.log(`******************************************
@@ -53,6 +56,13 @@ process.on('unhandledRejection', (error) => {
   resource: ${resource}
   environment: ${environment}
 ******************************************`);
+
+  const requestBodyJson: {
+    days: string;
+    enabled: boolean;
+    times: string;
+    localTimeZoneId: string;
+  } = JSON.parse(request_body);
 
   const authToken = await retrieveToken({
     tenantId: tenant_id,
@@ -68,5 +78,11 @@ process.on('unhandledRejection', (error) => {
     authToken,
     groupId: group_id,
     datasetId: dataset_id,
+    body: {
+      days: JSON.parse(requestBodyJson.days),
+      enabled: requestBodyJson.enabled,
+      times: JSON.parse(requestBodyJson.times),
+      localTimeZoneId: requestBodyJson.localTimeZoneId,
+    },
   });
 })();
