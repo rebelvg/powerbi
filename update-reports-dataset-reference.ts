@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-import { parseArguments, retrieveToken } from './get-group-id';
-
 export async function getReportsByGroupId({
   authToken,
   groupId,
@@ -56,7 +54,7 @@ export async function updateReportsDatasetReference({
     if (reports.includes(currentReport.id)) {
       try {
         await axios.post(
-          `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}`,
+          `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}/rebind`,
           requestBody,
           {
             headers: {
@@ -65,10 +63,15 @@ export async function updateReportsDatasetReference({
           },
         );
       } catch (error) {
-        console.error('rebind_failed', error?.response?.body, error.message);
+        console.error(
+          'rebind_failed',
+          error.message,
+          currentReport.id,
+          error?.response?.body,
+        );
       }
     } else {
-      console.log('not_in_reports');
+      console.log('not_in_reports', groupId, currentReport.id);
     }
   }
 }
