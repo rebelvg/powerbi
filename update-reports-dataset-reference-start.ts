@@ -52,18 +52,6 @@ process.on('unhandledRejection', (error) => {
   const requestBodyJson = JSON.parse(request_body);
   const reportsJson: string[] = JSON.parse(reports);
 
-  console.log('parsed_args', {
-    tenant_id,
-    username,
-    client_id,
-    scope,
-    resource,
-    environment,
-    group_id,
-    request_body,
-    reports,
-  });
-
   console.log(`******************************************
   Arguments
   -----------
@@ -75,7 +63,7 @@ process.on('unhandledRejection', (error) => {
   environment: ${environment}
   request_body: ${request_body}
   reports: ${reports}
-  ******************************************`);
+******************************************`);
 
   const authToken = await retrieveToken({
     tenantId: tenant_id,

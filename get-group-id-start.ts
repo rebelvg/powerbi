@@ -45,7 +45,7 @@ process.on('unhandledRejection', (error) => {
   scope: ${scope}
   resource: ${resource}
   environment: ${environment}
-  ******************************************`);
+******************************************`);
 
   const authToken = await retrieveToken({
     tenantId: tenant_id,

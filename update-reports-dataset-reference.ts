@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export async function getReportsByGroupId({
   authToken,
@@ -60,7 +60,7 @@ export async function updateReportsDatasetReference({
 
       try {
         await axios.post(
-          `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}/rebind`,
+          `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}/Rebind`,
           requestBody,
           {
             headers: {
@@ -80,10 +80,12 @@ export async function updateReportsDatasetReference({
         console.error(
           'rebind_failed',
           error.message,
+          'groupId',
+          groupId,
           'report_id',
           currentReport.id,
           'body',
-          error?.response?.body,
+          (error as AxiosError).response?.data,
         );
       }
     } else {
