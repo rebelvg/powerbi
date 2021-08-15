@@ -42,6 +42,43 @@ async function getReportsByGroupId({
   return value;
 }
 
+async function updateReportsDatasetReference({
+  groupId,
+  currentReports,
+  reports,
+  requestBody,
+  authToken,
+}: {
+  groupId: string;
+  currentReports: {
+    id: string;
+    datasetId: string;
+  }[];
+  reports: string[];
+  requestBody: Record<string, any>;
+  authToken: string;
+}) {
+  for (const currentReport of currentReports) {
+    if (reports.includes(currentReport.id)) {
+      if (currentReport.datasetId === requestBody.datasetId) {
+        try {
+          await axios.post(
+            `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}`,
+            requestBody,
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            },
+          );
+        } catch (error) {
+          console.error('rebind_failed', error?.response?.body, error.message);
+        }
+      }
+    }
+  }
+}
+
 (async () => {
   const {
     tenant_id,
@@ -81,6 +118,9 @@ async function getReportsByGroupId({
     '--reports',
   ]);
 
+  const requestBodyJson = JSON.parse(request_body);
+  const reportsJson: string[] = JSON.parse(reports);
+
   console.log('parsed_args', {
     tenant_id,
     username,
@@ -109,4 +149,15 @@ async function getReportsByGroupId({
   });
 
   console.log(reportsByGroup);
+
+  await updateReportsDatasetReference({
+    groupId: group_id,
+    currentReports: reportsByGroup.map((report) => ({
+      id: report.id,
+      datasetId: report.datasetId,
+    })),
+    reports: reportsJson,
+    requestBody: requestBodyJson,
+    authToken,
+  });
 })();
