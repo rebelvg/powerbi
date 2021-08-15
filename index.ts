@@ -44,8 +44,6 @@ function parseArguments(args: string[]): {
     }
   });
 
-  console.log(parsedArgs);
-
   return parsedArgs;
 }
 
@@ -144,8 +142,6 @@ async function getGroupId({
     resource,
     environment,
   });
-
-  throw 1;
 
   const authToken = await retrieveToken({
     tenantId: tenant_id,
