@@ -1,72 +1,47 @@
 import axios from 'axios';
 
 process.on('unhandledRejection', (error) => {
-  console.error(error);
+  console.error('error', error);
 
   process.exit(1);
 });
 
 function parseArguments(args: string[]): {
-  tenantId: string;
+  tenant_id: string;
   username: string;
   password: string;
-  clientId: string;
-  clientSecret: string;
+  client_id: string;
+  client_secret: string;
   scope: string;
   resource: string;
   environment: string;
 } {
-  let tenantId: string;
-  let username: string;
-  let password: string;
-  let clientId: string;
-  let clientSecret: string;
-  let scope: string;
-  let resource: string;
-  let environment: string;
+  const expectedArgs = [
+    'tenant_id',
+    'username',
+    'password',
+    'client_id',
+    'client_secret',
+    'scope',
+    'resource',
+    'environment',
+  ];
+
+  const parsedArgs: any = {};
 
   args.forEach((arg, index) => {
-    switch (arg) {
-      case '--tenant_id': {
-        tenantId = args[index + 1];
+    if (expectedArgs.includes(`--${arg}`)) {
+      const nextArgument = args[index + 1];
+
+      if (!nextArgument) {
+        throw new Error('bad_argument');
       }
-      case '--username': {
-        username = args[index + 1];
-      }
-      case '--password': {
-        password = args[index + 1];
-      }
-      case '--client_id': {
-        clientId = args[index + 1];
-      }
-      case '--client_secret': {
-        clientSecret = args[index + 1];
-      }
-      case '--scope': {
-        scope = args[index + 1];
-      }
-      case '--resource': {
-        resource = args[index + 1];
-      }
-      case '--environment': {
-        environment = args[index + 1];
-      }
-      default: {
-        break;
-      }
+
+      parsedArgs[arg] = nextArgument;
     }
   });
 
-  return {
-    tenantId,
-    username,
-    password,
-    clientId,
-    clientSecret,
-    scope,
-    resource,
-    environment,
-  };
+  return parsedArgs;
 }
 
 async function retrieveToken({
@@ -88,13 +63,15 @@ async function retrieveToken({
 }): Promise<string> {
   const { data } = await axios.post<{ access_token: string }>(
     `https://login.windows.net/${tenantId}/oauth2/token`,
-    `grant_type=password
-    &username=${username}
-    &password=${password}
-    &client_id=${clientId}
-    &client_secret=${clientSecret}
-    &scope=${scope}
-    &resource=${resource}`,
+    {
+      data: `grant_type=password
+      &username=${username}
+      &password=${password}
+      &client_id=${clientId}
+      &client_secret=${clientSecret}
+      &scope=${scope}
+      &resource=${resource}`,
+    },
   );
 
   return data.access_token;
@@ -114,7 +91,7 @@ async function getGroupId({
       name: string;
       id: string;
     }[];
-  }>(`https://api.powerbi.com/v1.0/myorg/groups`, {
+  }>('https://api.powerbi.com/v1.0/myorg/groups', {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },
@@ -129,41 +106,41 @@ async function getGroupId({
   }
 
   if (!groupId) {
-    throw new Error(`error_no_group_id`);
+    throw new Error('error_no_group_id');
   }
 
-  console.log(`get_group_id`, groupId);
+  console.log('get_group_id', groupId);
 
   return groupId;
 }
 
 (async () => {
   const {
-    tenantId,
+    tenant_id,
     username,
     password,
-    clientId,
-    clientSecret,
+    client_id,
+    client_secret,
     scope,
     resource,
     environment,
   } = parseArguments(process.argv);
 
   console.log('parsed_args', {
-    tenantId,
+    tenant_id,
     username,
-    clientId,
+    client_id,
     scope,
     resource,
     environment,
   });
 
   const authToken = await retrieveToken({
-    tenantId,
+    tenantId: tenant_id,
     username,
     password,
-    clientId,
-    clientSecret,
+    clientId: client_id,
+    clientSecret: client_secret,
     scope,
     resource,
   });
