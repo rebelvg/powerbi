@@ -1,11 +1,10 @@
 {
   "name": "powerbi",
   "version": "1.0.0",
-  "main": "index.js",
-  "author": "Volodymyr Rebel <rebelvgchannel@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node index.ts"
+    "get-group-id": "ts-node get-group-id.ts",
+    "update-reports-dataset-reference": "ts-node update-reports-dataset-reference.ts"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.172",

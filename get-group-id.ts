@@ -7,27 +7,7 @@ process.on('unhandledRejection', (error) => {
   process.exit(1);
 });
 
-function parseArguments(args: string[]): {
-  tenant_id: string;
-  username: string;
-  password: string;
-  client_id: string;
-  client_secret: string;
-  scope: string;
-  resource: string;
-  environment: string;
-} {
-  const expectedArgs = [
-    '--tenant_id',
-    '--username',
-    '--password',
-    '--client_id',
-    '--client_secret',
-    '--scope',
-    '--resource',
-    '--environment',
-  ];
-
+export function parseArguments<T>(args: string[], expectedArgs: string[]): T {
   const parsedArgs: any = {};
 
   args.forEach((arg, index) => {
@@ -47,7 +27,7 @@ function parseArguments(args: string[]): {
   return parsedArgs;
 }
 
-async function retrieveToken({
+export async function retrieveToken({
   tenantId,
   username,
   password,
@@ -86,11 +66,11 @@ async function retrieveToken({
 }
 
 async function getGroupId({
-  environment,
   authToken,
+  environment,
 }: {
-  environment: string;
   authToken: string;
+  environment: string;
 }): Promise<string> {
   const {
     data: { value },
@@ -132,7 +112,25 @@ async function getGroupId({
     scope,
     resource,
     environment,
-  } = parseArguments(process.argv);
+  } = parseArguments<{
+    tenant_id: string;
+    username: string;
+    password: string;
+    client_id: string;
+    client_secret: string;
+    scope: string;
+    resource: string;
+    environment: string;
+  }>(process.argv, [
+    '--tenant_id',
+    '--username',
+    '--password',
+    '--client_id',
+    '--client_secret',
+    '--scope',
+    '--resource',
+    '--environment',
+  ]);
 
   console.log('parsed_args', {
     tenant_id,
@@ -154,8 +152,8 @@ async function getGroupId({
   });
 
   const groupId = await getGroupId({
-    environment,
     authToken,
+    environment,
   });
 
   console.log(`##vso[task.setvariable variable=group_id]${groupId}`);
