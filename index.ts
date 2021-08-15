@@ -97,7 +97,7 @@ async function getGroupId({
     },
   });
 
-  let groupId: string;
+  let groupId: string | undefined;
 
   for (const group of value) {
     if (group.name === environment) {
