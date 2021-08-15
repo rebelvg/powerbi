@@ -36,14 +36,16 @@ process.on('unhandledRejection', (error) => {
     '--environment',
   ]);
 
-  console.log('parsed_args', {
-    tenant_id,
-    username,
-    client_id,
-    scope,
-    resource,
-    environment,
-  });
+  console.log(`******************************************
+  Arguments
+  -----------
+  tenant_id: ${tenant_id}
+  username: ${username}
+  client_id: ${client_id}
+  scope: ${scope}
+  resource: ${resource}
+  environment: ${environment}
+  ******************************************`);
 
   const authToken = await retrieveToken({
     tenantId: tenant_id,

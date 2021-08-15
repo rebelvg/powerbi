@@ -64,6 +64,19 @@ process.on('unhandledRejection', (error) => {
     reports,
   });
 
+  console.log(`******************************************
+  Arguments
+  -----------
+  tenant_id: ${tenant_id}
+  username: ${username}
+  client_id: ${client_id}
+  scope: ${scope}
+  resource: ${resource}
+  environment: ${environment}
+  request_body: ${request_body}
+  reports: ${reports}
+  ******************************************`);
+
   const authToken = await retrieveToken({
     tenantId: tenant_id,
     username,

@@ -5,13 +5,11 @@ export function parseArguments<T>(args: string[], expectedArgs: string[]): T {
   const parsedArgs: any = {};
 
   args.forEach((arg, index) => {
-    console.log(arg, index);
-
     if (expectedArgs.includes(arg)) {
       const nextArgument = args[index + 1];
 
       if (!nextArgument) {
-        throw new Error('bad_argument');
+        throw new Error('bad_arguments');
       }
 
       parsedArgs[arg.substring(2)] = nextArgument;

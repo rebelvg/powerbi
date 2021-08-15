@@ -52,6 +52,12 @@ export async function updateReportsDatasetReference({
 }) {
   for (const currentReport of currentReports) {
     if (reports.includes(currentReport.id)) {
+      if (currentReport.datasetId === requestBody.datasetId) {
+        console.log('skipping_rebind', 'datasetId', currentReport.datasetId);
+
+        continue;
+      }
+
       try {
         await axios.post(
           `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/reports/${currentReport.id}/rebind`,
@@ -62,11 +68,21 @@ export async function updateReportsDatasetReference({
             },
           },
         );
+
+        console.log(
+          'rebind_success',
+          'dataset_id',
+          currentReport.datasetId,
+          'report_id',
+          currentReport.id,
+        );
       } catch (error) {
         console.error(
           'rebind_failed',
           error.message,
+          'report_id',
           currentReport.id,
+          'body',
           error?.response?.body,
         );
       }
