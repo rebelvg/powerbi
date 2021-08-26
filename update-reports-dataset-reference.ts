@@ -110,13 +110,13 @@ export async function updateReportsDatasetReference({
     datasetId: string;
   }[];
   reports: string[];
-  requestBody: Record<string, any>;
+  requestBody: { datasetId: string };
   authToken: string;
 }) {
   for (const currentReport of currentReports) {
     if (reports.includes(currentReport.name)) {
       if (currentReport.datasetId === requestBody.datasetId) {
-        console.log('skipping_rebind', 'datasetId', currentReport.datasetId);
+        console.log(`SKIPPING: ALREADY BOUND: ${currentReport.name}`);
 
         continue;
       }
@@ -133,26 +133,15 @@ export async function updateReportsDatasetReference({
         );
 
         console.log(
-          'rebind_success',
-          'dataset_id',
-          currentReport.datasetId,
-          'report_id',
-          currentReport.id,
+          `REBOUND: ${currentReport.name}, OLD DATASET ID: ${currentReport.datasetId}, NEW DATASET ID: ${requestBody.datasetId}`,
         );
       } catch (error) {
-        console.error(
-          'rebind_failed',
-          error.message,
-          'groupId',
-          groupId,
-          'report_id',
-          currentReport.id,
-          'body',
-          (error as AxiosError).response?.data,
+        console.log(
+          `REBIND FAILED: ${currentReport.name}, ERROR: ${error.message}`,
         );
       }
     } else {
-      console.log('not_in_reports', groupId, currentReport.id);
+      console.log(`SKIPPING: DOESN'T MATCH: ${currentReport.name}`);
     }
   }
 }
