@@ -64,11 +64,38 @@ export async function retrieveToken({
 
 export async function getReportsByGroupId({
   authToken,
-  groupId,
+  groupName,
 }: {
   authToken: string;
-  groupId: string;
+  groupName: string;
 }) {
+  const {
+    data: { value: groups },
+  } = await axios.get<{
+    value: {
+      id: string;
+      name: string;
+    }[];
+  }>(`https://api.powerbi.com/v1.0/myorg/groups`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  let groupId: string = null;
+
+  groups.forEach((group) => {
+    if (group.name === groupName) {
+      groupId = group.id;
+    }
+  });
+
+  if (!groupId) {
+    throw new Error(`GROUP ID NOT FOUND BY NAME: ${groupName}`);
+  }
+
+  console.log(`GROUP ID FOUND BY NAME: ${groupName}`);
+
   const {
     data: { value },
   } = await axios.get<{
@@ -93,7 +120,10 @@ export async function getReportsByGroupId({
     throw new Error('no_reports_found');
   }
 
-  return value;
+  return {
+    groupId,
+    reports: value,
+  };
 }
 
 export async function updateReportsDatasetReference({
@@ -156,7 +186,7 @@ export async function updateReportsDatasetReference({
     scope,
     resource,
     environment,
-    group_id,
+    group_name,
     request_body,
     reports,
   } = parseArguments<{
@@ -168,7 +198,7 @@ export async function updateReportsDatasetReference({
     scope: string;
     resource: string;
     environment: string;
-    group_id: string;
+    group_name: string;
     request_body: string;
     reports: string;
   }>(process.argv, [
@@ -180,7 +210,7 @@ export async function updateReportsDatasetReference({
     '--scope',
     '--resource',
     '--environment',
-    '--group_id',
+    '--group_name',
     '--request_body',
     '--reports',
   ]);
@@ -199,6 +229,7 @@ export async function updateReportsDatasetReference({
   environment: ${environment}
   request_body: ${request_body}
   reports: ${reports}
+  group_name: ${group_name}
 ******************************************`);
 
   const authToken = await retrieveToken({
@@ -211,13 +242,13 @@ export async function updateReportsDatasetReference({
     resource,
   });
 
-  const reportsByGroup = await getReportsByGroupId({
+  const { groupId, reports: reportsByGroup } = await getReportsByGroupId({
     authToken,
-    groupId: group_id,
+    groupName: group_name,
   });
 
   await updateReportsDatasetReference({
-    groupId: group_id,
+    groupId,
     currentReports: reportsByGroup.map((report) => ({
       id: report.id,
       name: report.name,
