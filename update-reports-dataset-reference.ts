@@ -82,7 +82,7 @@ export async function getReportsByGroupId({
     },
   });
 
-  let groupId: string = null;
+  let groupId: string | null = null;
 
   groups.forEach((group) => {
     if (group.name === groupName) {
