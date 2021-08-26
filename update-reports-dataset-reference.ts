@@ -106,6 +106,7 @@ export async function updateReportsDatasetReference({
   groupId: string;
   currentReports: {
     id: string;
+    name: string;
     datasetId: string;
   }[];
   reports: string[];
@@ -113,7 +114,7 @@ export async function updateReportsDatasetReference({
   authToken: string;
 }) {
   for (const currentReport of currentReports) {
-    if (reports.includes(currentReport.id)) {
+    if (reports.includes(currentReport.name)) {
       if (currentReport.datasetId === requestBody.datasetId) {
         console.log('skipping_rebind', 'datasetId', currentReport.datasetId);
 
@@ -230,6 +231,7 @@ export async function updateReportsDatasetReference({
     groupId: group_id,
     currentReports: reportsByGroup.map((report) => ({
       id: report.id,
+      name: report.name,
       datasetId: report.datasetId,
     })),
     reports: reportsJson,
