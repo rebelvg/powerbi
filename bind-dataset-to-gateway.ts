@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 async function bindDatasetToGateway({
   authToken,
@@ -38,15 +38,21 @@ async function bindDatasetToGateway({
 
   console.log(`GROUP ID FOUND BY NAME: ${groupName}`);
 
-  await axios.post(
-    `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/datasets/${datasetId}/Default.BindToGateway`,
-    body,
-    {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
+  try {
+    await axios.post(
+      `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/datasets/${datasetId}/Default.BindToGateway`,
+      body,
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
       },
-    },
-  );
+    );
+  } catch (error) {
+    console.log('REQUEST ERROR: ', (error as AxiosError)?.response?.data);
+
+    throw error;
+  }
 }
 
 export function parseArguments<T>(args: string[], expectedArgs: string[]): T {
