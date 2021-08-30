@@ -2,15 +2,42 @@ import axios from 'axios';
 
 async function bindDatasetToGateway({
   authToken,
-  groupId,
+  groupName,
   datasetId,
   body,
 }: {
   authToken: string;
-  groupId: string;
+  groupName: string;
   datasetId: string;
   body: Record<string, any>;
 }) {
+  const {
+    data: { value: groups },
+  } = await axios.get<{
+    value: {
+      id: string;
+      name: string;
+    }[];
+  }>(`https://api.powerbi.com/v1.0/myorg/groups`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
+  let groupId: string | null = null;
+
+  groups.forEach((group) => {
+    if (group.name === groupName) {
+      groupId = group.id;
+    }
+  });
+
+  if (!groupId) {
+    throw new Error(`GROUP ID NOT FOUND BY NAME: ${groupName}`);
+  }
+
+  console.log(`GROUP ID FOUND BY NAME: ${groupName}`);
+
   await axios.post(
     `https://api.powerbi.com/v1.0/myorg/groups/${groupId}/datasets/${datasetId}/Default.BindToGateway`,
     body,
@@ -94,7 +121,7 @@ process.on('unhandledRejection', (error) => {
     scope,
     resource,
     environment,
-    group_id,
+    group_name,
     dataset_id,
     request_body,
   } = parseArguments<{
@@ -106,7 +133,7 @@ process.on('unhandledRejection', (error) => {
     scope: string;
     resource: string;
     environment: string;
-    group_id: string;
+    group_name: string;
     dataset_id: string;
     request_body: string;
   }>(process.argv, [
@@ -118,7 +145,7 @@ process.on('unhandledRejection', (error) => {
     '--scope',
     '--resource',
     '--environment',
-    '--group_id',
+    '--group_name',
     '--dataset_id',
     '--request_body',
   ]);
@@ -148,7 +175,7 @@ process.on('unhandledRejection', (error) => {
 
   await bindDatasetToGateway({
     authToken,
-    groupId: group_id,
+    groupName: group_name,
     datasetId: dataset_id,
     body: requestBodyJson,
   });
